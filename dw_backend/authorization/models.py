@@ -18,10 +18,9 @@ class Role(Enum):
 
 
 class Sub(Enum):
-    WEEK = 7 # 7 days in a week
-    MONTH = 30 # Approximately 30 days in a month
-    THREE_MONTHS = 90 # Approximately 90 days in three months
-    HALF_A_YEAR = 182 # Approximately 182 days in half a year
+    MONTH = 30
+    THREE_MONTHS = 90
+    YEAR = 364 
     NONE = 0
 
     @classmethod
