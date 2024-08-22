@@ -22,17 +22,17 @@ class SubscriptionManager(models.Manager):
 class Subscription(models.Model):
     id = models.AutoField(primary_key=True)
 
-    SubType = models.IntegerField(
+    subType = models.IntegerField(
         choices=Sub.get_choices(),
         default=Sub.NONE.value
     )
 
-    StartDate = models.DateTimeField(default=timezone.now)
+    startDate = models.DateTimeField(default=timezone.now)
 
-    ExpirationDate = models.DateTimeField(null=True, blank=True)
+    sxpirationDate = models.DateTimeField(null=True, blank=True)
 
-    CreatedAt = models.DateTimeField(auto_now_add=True)
-    UpdatedAt =  models.DateTimeField(auto_now=True)
+    createdAt = models.DateTimeField(auto_now_add=True)
+    updatedAt =  models.DateTimeField(auto_now=True)
 
     def purchase_subscription(self, sub_type):
         """Логика покупки подписки"""

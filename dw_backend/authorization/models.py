@@ -23,33 +23,45 @@ class DwUserManager(BaseUserManager):
         return self.get(**{self.model.USERNAME_FIELD: username})
     
     def create_superuser(self, username, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('role', Role.MANAGER.value)
 
-        if extra_fields.get('is_staff') is not True:
-            raise ValueError('Superuser must have is_staff=True.')
-        if extra_fields.get('is_superuser') is not True:
-            raise ValueError('Superuser must have is_superuser=True.')
+        if extra_fields.get('role') != Role.CEO.value:
+            raise ValueError('Superuser must have role=CEO.')
 
         return self.create_user(username, password, **extra_fields)
+    
+    def create_user(self, username, email, password=None, hwid=None, role=None, **extra_fields):
+        user = self.model(
+            username=username,
+            email=email,
+            hwid=hwid,
+            role=role,
+            **extra_fields
+        )
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
 
 class DwUser(AbstractBaseUser):
     id = models.AutoField(primary_key=True)
-    Email = models.EmailField(unique=True, null=False)
-    Password = models.CharField(max_length=50)
-    Username = models.CharField(max_length=50, unique=True)
+    email = models.EmailField(unique=True, null=False)
+    password = models.CharField(max_length=50)
+    username = models.CharField(max_length=50, unique=True)
     
-    Hwid = models.TextField(null=True)
+    hwid = models.TextField(null=True)
     role = models.CharField(
         max_length=50,
         choices=Role.get_choices(),
         default=Role.USER.value
     )
 
-    SubId = models.ForeignKey(Subscription, null=True, blank=True, on_delete=models.SET_NULL)
+    subId = models.ForeignKey(Subscription, null=True, blank=True, on_delete=models.SET_NULL)
 
-    
+
+    last_login = None  #хуйня появляется из-за наследования от AbstractBaseUser так что убиваем
+
+
     USERNAME_FIELD = 'username'
     REQUIRED_FIELDS = ['password']
     objects = DwUserManager()

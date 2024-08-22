@@ -42,8 +42,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'authorization',
     'file_system',
-    'refferals',
-    'subscription'
+    'user_statistics',
+    'subscription',
+
 ]
 
 REST_FRAMEWORK = {
