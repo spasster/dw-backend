@@ -16,23 +16,26 @@ class Sub(Enum):
     
     
 class SubscriptionManager(models.Manager):
-    def available(self):
-        return self.filter(SubType=True)
+    def create_sub(self, user_id, subType=Sub.NONE.value,  **extra_fields):
+        statistics = self.model(
+            user=user_id,
+            subType=subType,
+            **extra_fields
+        )
+        statistics.save(using=self._db)
+        return statistics
     
 class Subscription(models.Model):
-    id = models.AutoField(primary_key=True)
-
+    user = models.OneToOneField('authorization.DwUser', on_delete=models.CASCADE, primary_key=True)
     subType = models.IntegerField(
         choices=Sub.get_choices(),
         default=Sub.NONE.value
     )
-
-    startDate = models.DateTimeField(default=timezone.now)
-
-    sxpirationDate = models.DateTimeField(null=True, blank=True)
-
-    createdAt = models.DateTimeField(auto_now_add=True)
+    startDate = models.DateTimeField(default=None, null=True)
+    expirationDate = models.DateTimeField(default=None, null=True)
     updatedAt =  models.DateTimeField(auto_now=True)
+
+    objects = SubscriptionManager()
 
     def purchase_subscription(self, sub_type):
         """Логика покупки подписки"""
@@ -49,6 +52,4 @@ class Subscription(models.Model):
             else:
                 self.ExpirationDate += timedelta(days=sub_type)
         self.save()
-
-    objects = SubscriptionManager()
 

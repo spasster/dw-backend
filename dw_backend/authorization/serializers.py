@@ -19,5 +19,5 @@ class DwUserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         password = validated_data.pop('password')
-        user = DwUser.objects.create(**validated_data, password=make_password(password))
+        user = DwUser.objects.create_user(**validated_data, password=make_password(password))
         return user

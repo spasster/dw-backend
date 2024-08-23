@@ -1,7 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from enum import Enum
+
 from subscription.models import Subscription
+from user_statistics.models import RefferalSystem
+from user_statistics.models import Statistics
+
 
 
 class Role(Enum):
@@ -19,18 +23,16 @@ class Role(Enum):
 
 
 class DwUserManager(BaseUserManager):
-    def get_by_natural_key(self, username):
-        return self.get(**{self.model.USERNAME_FIELD: username})
     
     def create_superuser(self, username, password=None, **extra_fields):
         extra_fields.setdefault('role', Role.MANAGER.value)
 
-        if extra_fields.get('role') != Role.CEO.value:
-            raise ValueError('Superuser must have role=CEO.')
+        if extra_fields.get('role') != Role.MANAGER.value:
+            raise ValueError('Superuser must have role=MANAGER.')
 
         return self.create_user(username, password, **extra_fields)
     
-    def create_user(self, username, email, password=None, hwid=None, role=None, **extra_fields):
+    def create_user(self, username, email, password=None, hwid=None, role=Role.USER.value, **extra_fields):
         user = self.model(
             username=username,
             email=email,
@@ -40,6 +42,12 @@ class DwUserManager(BaseUserManager):
         )
         user.set_password(password)
         user.save(using=self._db)
+
+        # Создание связанных записей в таблицах Subscription, RefferalSystem, Statistics
+        Subscription.objects.create_sub(user_id=user)
+        RefferalSystem.objects.create_refferal(user_id=user)
+        Statistics.objects.create_statistics(user_id=user)
+
         return user
 
 
@@ -55,9 +63,6 @@ class DwUser(AbstractBaseUser):
         choices=Role.get_choices(),
         default=Role.USER.value
     )
-
-    subId = models.ForeignKey(Subscription, null=True, blank=True, on_delete=models.SET_NULL)
-
 
     last_login = None  #хуйня появляется из-за наследования от AbstractBaseUser так что убиваем
 
