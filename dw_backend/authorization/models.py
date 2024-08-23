@@ -54,7 +54,6 @@ class DwUserManager(BaseUserManager):
 class DwUser(AbstractBaseUser):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True, null=False)
-    password = models.CharField(max_length=50)
     username = models.CharField(max_length=50, unique=True)
     
     hwid = models.TextField(null=True)
