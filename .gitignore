@@ -1,4 +1,5 @@
 /.idea
 /.venv
 /.vscode
-/dw_backend/*/migrations/
+dw_backend/**/migrations/
+dw_backend/**/__pycache__/
