@@ -27,7 +27,7 @@ class SubscriptionManager(models.Manager):
     
 class Subscription(models.Model):
     user = models.OneToOneField('authorization.DwUser', on_delete=models.CASCADE, primary_key=True)
-    sub_type = models.IntegerField(
+    sub_dur = models.IntegerField(
         choices=Sub.get_choices(),
         default=Sub.NONE.value
     )

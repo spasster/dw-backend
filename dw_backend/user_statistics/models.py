@@ -23,21 +23,20 @@ class RefferalManager(models.Manager):
 
 class RefferalSystem(models.Model):
     user = models.OneToOneField('authorization.DwUser', on_delete=models.CASCADE, primary_key=True)
-    refferalAvailable = models.BooleanField(default=False)
+    refferal_available = models.BooleanField(default=False)
 
     code = models.CharField(max_length=50, null=True)
-    refferalNumber = models.IntegerField(null=True)
-    refferalBonus = models.IntegerField(null=True)
+    refferal_number = models.IntegerField(null=True)
+    refferal_bonus = models.IntegerField(null=True)
 
     objects = RefferalManager()
 
 
 
 class StatisticsManager(models.Manager):
-    def create_statistics(self, user_id, last_login=None,  **extra_fields):
+    def create_statistics(self, user_id, **extra_fields):
         statistics = self.model(
             user=user_id,
-            last_login=last_login,
             **extra_fields
         )
         statistics.save(using=self._db)
@@ -46,7 +45,7 @@ class StatisticsManager(models.Manager):
 class Statistics(models.Model):
     user = models.OneToOneField('authorization.DwUser', on_delete=models.CASCADE, primary_key=True)
     reg_date = models.DateTimeField(auto_now_add=True) 
-    last_login = models.DateTimeField(null=True, auto_now=True) 
+    last_launch = models.DateTimeField(null=True, default=None) 
     launch_number = models.IntegerField(default=0)
     playtime = models.DurationField(default=timedelta()) 
 
@@ -58,10 +57,12 @@ class Statistics(models.Model):
         total_minutes = int(self.playtime.total_seconds() // 60)
         return total_minutes
     
-    def update_statistics(self, additional_playtime, increment_launches):
+    def update_statistics(self, additional_playtime, increment_launches, new_last_launch):
         if additional_playtime:
             self.playtime += additional_playtime
         if increment_launches:
             self.launch_number += 1
+        if new_last_launch:
+            self.last_launch = new_last_launch
             
         self.save()

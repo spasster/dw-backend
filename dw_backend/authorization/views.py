@@ -7,7 +7,6 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status
 
 
-
 from authorization.models import DwUser
 from authorization.serializers import DwUserSerializer
 from authorization.serializers import CustomAuthTokenSerializer
@@ -34,13 +33,6 @@ class RegistrationViewSet(viewsets.ModelViewSet):
             'refresh': str(refresh),
             'access': str(refresh.access_token),
         }, status=status.HTTP_200_OK)
-    
-
-class GetViewSet(viewsets.ModelViewSet):
-    """Получение всех юзеров"""
-
-    queryset = DwUser.objects.all()
-    serializer_class = DwUserSerializer
 
 
 class CustomAuth(TokenObtainPairView):
