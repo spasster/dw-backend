@@ -27,13 +27,13 @@ class SubscriptionManager(models.Manager):
     
 class Subscription(models.Model):
     user = models.OneToOneField('authorization.DwUser', on_delete=models.CASCADE, primary_key=True)
-    subType = models.IntegerField(
+    sub_type = models.IntegerField(
         choices=Sub.get_choices(),
         default=Sub.NONE.value
     )
-    startDate = models.DateTimeField(default=None, null=True)
-    expirationDate = models.DateTimeField(default=None, null=True)
-    updatedAt =  models.DateTimeField(auto_now=True)
+    start_date = models.DateTimeField(default=None, null=True)
+    expiration_date = models.DateTimeField(default=None, null=True)
+    updated_at =  models.DateTimeField(auto_now=True)
 
     objects = SubscriptionManager()
 

@@ -46,7 +46,7 @@ class StatisticsManager(models.Manager):
 class Statistics(models.Model):
     user = models.OneToOneField('authorization.DwUser', on_delete=models.CASCADE, primary_key=True)
     reg_date = models.DateTimeField(auto_now_add=True) 
-    last_login = models.DateTimeField(null=True) 
+    last_login = models.DateTimeField(null=True, auto_now=True) 
     launch_number = models.IntegerField(default=0)
     playtime = models.DurationField(default=timedelta()) 
 
@@ -57,3 +57,11 @@ class Statistics(models.Model):
     def display_playtime_in_minutes(self):
         total_minutes = int(self.playtime.total_seconds() // 60)
         return total_minutes
+    
+    def update_statistics(self, additional_playtime, increment_launches):
+        if additional_playtime:
+            self.playtime += additional_playtime
+        if increment_launches:
+            self.launch_number += 1
+            
+        self.save()
