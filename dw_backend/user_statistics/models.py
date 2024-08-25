@@ -3,18 +3,18 @@ from datetime import timedelta
 
 
 class RefferalManager(models.Manager):
-    def create_refferal(self, user_id, refferalAvailable=False, **extra_fields):
-        if not refferalAvailable:
+    def create_refferal(self, user_id, refferal_available=False, **extra_fields):
+        if not refferal_available:
             code = None
-            refferalNumber = None
-            refferalBonus = None
+            refferal_number = None
+            refferal_bonus = None
 
         refferal = self.model(
             user=user_id,
-            refferalAvailable=refferalAvailable,
+            refferal_available=refferal_available,
             code=code,
-            refferalNumber=refferalNumber,
-            refferalBonus=refferalBonus,
+            refferal_number=refferal_number,
+            refferal_bonus=refferal_bonus,
             **extra_fields
         )
 
@@ -31,9 +31,17 @@ class RefferalSystem(models.Model):
 
     objects = RefferalManager()
 
+    def activate_refferal_system(self, code):
+        self.refferal_available = True
+        self.code = code
+        self.refferal_number = 0
+        self.refferal_bonus = 0
+        self.save()
+
 
 
 class StatisticsManager(models.Manager):
+
     def create_statistics(self, user_id, **extra_fields):
         statistics = self.model(
             user=user_id,

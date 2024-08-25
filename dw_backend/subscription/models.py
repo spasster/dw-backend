@@ -2,6 +2,7 @@ from django.db import models
 from enum import Enum
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework.exceptions import ValidationError
 
 
 class Sub(Enum):
@@ -16,10 +17,10 @@ class Sub(Enum):
     
     
 class SubscriptionManager(models.Manager):
-    def create_sub(self, user_id, subType=Sub.NONE.value,  **extra_fields):
+    def create_sub(self, user_id, sub_dur=Sub.NONE.value,  **extra_fields):
         statistics = self.model(
             user=user_id,
-            subType=subType,
+            sub_dur=sub_dur,
             **extra_fields
         )
         statistics.save(using=self._db)
@@ -37,19 +38,24 @@ class Subscription(models.Model):
 
     objects = SubscriptionManager()
 
-    def purchase_subscription(self, sub_type):
-        """Логика покупки подписки"""
-        self.SubType = sub_type
+    def add_subscription(self, sub_dur):
+        """добавление подписки подписки"""
+        try:
+            sub_enum = Sub[sub_dur] 
+        except KeyError:
+            raise ValidationError(f"Invalid subscription duration: {sub_dur}")
 
-        if sub_type == Sub.NONE.value:
-            self.StartDate = None
-            self.ExpirationDate = None
+        self.sub_dur = sub_enum.value 
+
+        if sub_enum == Sub.NONE:
+            self.start_date = None
+            self.expiration_date = None
         else:
-            if self.StartDate is None:
-                self.StartDate = timezone.now()
-            if self.ExpirationDate is None or self.ExpirationDate < timezone.now():
-                self.ExpirationDate = self.StartDate + timedelta(days=sub_type)
+            if self.start_date is None:
+                self.start_date = timezone.now()
+            if self.expiration_date is None or self.expiration_date < timezone.now():
+                self.expiration_date = self.start_date + timedelta(days=sub_enum.value)
             else:
-                self.ExpirationDate += timedelta(days=sub_type)
+                self.expiration_date += timedelta(days=sub_enum.value)
         self.save()
 
