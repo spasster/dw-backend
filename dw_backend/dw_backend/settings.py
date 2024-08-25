@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'file_system',
     'user_statistics',
     'subscription',
+    'payment'
 
 ]
 
