@@ -4,6 +4,8 @@ from django.utils import timezone
 from datetime import timedelta
 from rest_framework.exceptions import ValidationError
 
+from authorization.enums import Role
+
 
 class Sub(Enum):
     MONTH = 30
@@ -40,6 +42,7 @@ class Subscription(models.Model):
 
     def add_subscription(self, sub_dur):
         """добавление подписки подписки"""
+
         try:
             sub_enum = Sub[sub_dur] 
         except KeyError:
@@ -57,5 +60,10 @@ class Subscription(models.Model):
                 self.expiration_date = self.start_date + timedelta(days=sub_enum.value)
             else:
                 self.expiration_date += timedelta(days=sub_enum.value)
+
+        if self.user.role == Role.VISITOR.value:
+            self.user.role = Role.USER.value
+            self.user.save()
+
         self.save()
 
