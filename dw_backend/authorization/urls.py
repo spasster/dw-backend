@@ -12,4 +12,5 @@ urlpatterns = [
     path('verify/', TokenVerifyView.as_view(), name='token_verify'),
 
     path('set_hwid/', views.SetHWIDView.as_view(), name='auth_hwid'),
+    path('change_password/', views.ChangePasswordView.as_view(), name='auth_change'),
 ]

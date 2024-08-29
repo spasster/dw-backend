@@ -10,6 +10,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
+from rest_framework import generics
 
 from authorization.models import DwUser
 from authorization.serializers import DwUserSerializer
@@ -58,6 +59,7 @@ class CustomAuth(TokenObtainPairView):
         }, status=status.HTTP_200_OK)
     
 class SetHWIDView(APIView):
+    """Установка хвхида при первом запуске"""
 
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]
@@ -73,3 +75,25 @@ class SetHWIDView(APIView):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"success": "HWID set successfully."}, status=status.HTTP_200_OK)
+    
+
+class ChangePasswordView(generics.UpdateAPIView):
+    """
+    Позволяет аутентифицированному пользователю изменить свой пароль.
+    """
+
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def update(self, request, *args, **kwargs):
+        user = self.request.user
+        old_password = request.data.get("old_password")
+        new_password = request.data.get("new_password")
+
+        if not user.check_password(old_password):
+            return Response({"error": "Пароль введен неверно."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response({"success": "Пароль успешно изменен."}, status=status.HTTP_200_OK)

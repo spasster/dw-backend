@@ -6,6 +6,8 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
+from django.views import View
+from django.http import JsonResponse
 
 from user_statistics.models import Statistics
 from user_statistics.serializers import StatisticsUpdateSerializer
@@ -85,3 +87,24 @@ class GetPublickInfo(generics.RetrieveAPIView):
         username = self.kwargs.get('username')
         user = get_object_or_404(DwUser, username=username)
         return user
+    
+    
+class CheckRefferal(View):
+    """Проверка что такое рефферал код есть"""
+
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def get(self, request):
+        code = request.GET.get('code', None)
+        
+        if code is None:
+            return JsonResponse({'error': 'No referral code provided'}, status=400)
+
+        # Проверка, существует ли код
+        exists = RefferalSystem.objects.filter(code=code).exists()
+
+        if exists:
+            return JsonResponse({'exists': True}, status=200)
+        else:
+            return JsonResponse({'exists': False}, status=404)
