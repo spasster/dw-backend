@@ -5,11 +5,12 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
 
 from user_statistics.models import Statistics
 from user_statistics.serializers import StatisticsUpdateSerializer
 from authorization.models import DwUser
-from user_statistics.serializers import UserDetailSerializer
+from user_statistics.serializers import UserPrivateDetailSerializer, UserPublicDetailSerializer
 from user_statistics.models import RefferalSystem
 
 
@@ -60,16 +61,27 @@ class ActivateRefferals(APIView):
             return Response({"message": "Referral system enabled successfully."}, status=status.HTTP_200_OK)
         except RefferalSystem.DoesNotExist:
             return Response({"error": "Refferal system not found for this user."}, status=status.HTTP_404_NOT_FOUND)
+        
+class GetPrivateInfo(generics.RetrieveAPIView):
+    """Получение текущего аутентифицированного пользователя"""
 
-class GetViewSet(generics.RetrieveAPIView):
-    """Получение юзера по нику"""
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
     queryset = DwUser.objects.all()
-    serializer_class = UserDetailSerializer
+    serializer_class = UserPrivateDetailSerializer
 
-    def get_object(self ):
-        username = self.request.data['username']
-        try:
-            return DwUser.objects.get(username=username)
-        except DwUser.DoesNotExist:
-            raise NotFound('User not found')
+    def get_object(self):
+        user = get_object_or_404(DwUser, id=self.request.user.id)
+        return user
+
+        
+class GetPublickInfo(generics.RetrieveAPIView):
+    """Получение юзера по нику"""
+
+    serializer_class = UserPublicDetailSerializer
+
+    def get_object(self):
+        username = self.kwargs.get('username')
+        user = get_object_or_404(DwUser, username=username)
+        return user

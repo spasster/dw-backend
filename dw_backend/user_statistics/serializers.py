@@ -9,14 +9,14 @@ from authorization.models import DwUser
 class StatisticsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Statistics
-        fields = ['launch_number', 'playtime', 'last_launch']     
+        fields = ['launch_number', 'playtime', 'last_launch', 'reg_date']     
 class RefferalsSerializer(serializers.ModelSerializer):
     class Meta:
         model = RefferalSystem
         fields = ['refferal_available', 'code', 'refferal_number', 'refferal_bonus']
 
 
-class UserDetailSerializer(serializers.ModelSerializer):
+class UserPrivateDetailSerializer(serializers.ModelSerializer):
     subscription = SubscriptionSerializer(read_only=True)
     statistics = StatisticsSerializer(read_only=True)
     refferals = serializers.SerializerMethodField()
@@ -24,6 +24,36 @@ class UserDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = DwUser
         fields = ['id', 'username', 'email', 'hwid', 'role', 'subscription', 'statistics', 'refferals']
+
+    def get_refferals(self, obj):
+        try:
+            refferal_system = RefferalSystem.objects.get(user=obj)
+            if refferal_system.refferal_available:
+                return RefferalsSerializer(refferal_system).data
+            else:
+                return None
+        except RefferalSystem.DoesNotExist:
+            return None
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        refferals_data = self.get_refferals(instance)
+        if refferals_data:
+            representation['refferals'] = refferals_data
+        else:
+            representation.pop('refferals', None)  # Удаляем ключ, если данных нет
+
+        return representation
+
+class UserPublicDetailSerializer(serializers.ModelSerializer):
+    subscription = SubscriptionSerializer(read_only=True)
+    statistics = StatisticsSerializer(read_only=True)
+    refferals = serializers.SerializerMethodField()
+
+    class Meta:
+        model = DwUser
+        fields = ['id', 'username', 'role', 'subscription', 'statistics', 'refferals']
 
     def get_refferals(self, obj):
         try:

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from enum import Enum
+from rest_framework.exceptions import ValidationError
 
 from subscription.models import Subscription
 from user_statistics.models import RefferalSystem
@@ -36,7 +36,6 @@ class DwUserManager(BaseUserManager):
         return user
 
 
-
 class DwUser(AbstractBaseUser, PermissionsMixin):
     id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True, null=True)
@@ -50,6 +49,16 @@ class DwUser(AbstractBaseUser, PermissionsMixin):
     # REQUIRED_FIELDS = ['email']
 
     objects = DwUserManager()
+
+    def set_hwid(self, hwid_value):
+        if self.hwid is not None:
+            raise ValidationError("HWID can only be set once and cannot be changed.")
+        self.hwid = hwid_value
+        self.save()
+
+    def admin_update_hwid(self, hwid_value):
+        self.hwid = hwid_value
+        self.save()
 
     @property
     def is_staff(self):

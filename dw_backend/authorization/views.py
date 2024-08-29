@@ -5,7 +5,11 @@ from rest_framework.permissions import AllowAny
 import logging
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework import status
-
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.views import APIView
+from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import ValidationError
 
 from authorization.models import DwUser
 from authorization.serializers import DwUserSerializer
@@ -50,4 +54,22 @@ class CustomAuth(TokenObtainPairView):
         return Response({
             'refresh': str(refresh),
             'access': str(refresh.access_token),
+            'username': str(user.username)
         }, status=status.HTTP_200_OK)
+    
+class SetHWIDView(APIView):
+
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+    def post(self, request):
+        hwid_value = request.data.get('hwid')
+
+        user = get_object_or_404(DwUser, id=request.user.id)
+
+        try:
+            user.set_hwid(hwid_value)
+        except ValidationError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({"success": "HWID set successfully."}, status=status.HTTP_200_OK)
