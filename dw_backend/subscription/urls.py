@@ -1,14 +1,7 @@
 from django.urls import path
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-    TokenVerifyView
-)
-import authorization.views as views
+from subscription import views
 
 urlpatterns = [
-    path('register/', views.RegistrationViewSet.as_view({'get': 'list'}), name='auth_register'),
-    path('login/', TokenObtainPairView.as_view(), name='auth_login'),
-    path('refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('activate_key/', views.KeyActivationsView.as_view(), name='activate_key'),
+    path('new_keys/', views.NewKeys.as_view(), name='new_keys'),
 ]

@@ -90,7 +90,7 @@ class GetPublickInfo(generics.RetrieveAPIView):
     
     
 class CheckRefferal(View):
-    """Проверка что такое рефферал код есть"""
+    """Проверка что такой рефферал код есть"""
 
     permission_classes = [IsAuthenticated]
     authentication_classes = [JWTAuthentication]

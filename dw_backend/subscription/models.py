@@ -3,21 +3,30 @@ from enum import Enum
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.exceptions import ValidationError
+from django.contrib.auth import get_user_model
+import random
+import string
 
 from authorization.enums import Role
-
-
-class Sub(Enum):
-    MONTH = 30
-    THREE_MONTHS = 90
-    YEAR = 364 
-    NONE = 0
-
-    @classmethod
-    def get_choices(cls):
-        return [(i.name, i.value) for i in cls]
+from subscription.enums import Sub
     
     
+class SubscriptionKeyManager(models.Manager):
+    def activate_sub_key(self, user, key=None, **extra_fields):
+        """Create a subscription by key activation"""
+
+        sub = Subscription.objects.get(user = user)
+        print(key)
+
+        if key:
+            # Update subscription details based on key
+            key_obj = SubscriptionKey.objects.filter(key=key).first()
+            if not key_obj:
+                raise ValidationError("Invalid or expired key.")
+
+            sub.add_subscription(key_obj.sub_dur)
+            key_obj.delete() 
+
 class SubscriptionManager(models.Manager):
     def create_sub(self, user_id, sub_dur=Sub.NONE.value,  **extra_fields):
         statistics = self.model(
@@ -66,4 +75,28 @@ class Subscription(models.Model):
             self.user.save()
 
         self.save()
+
+
+class SubscriptionKey(models.Model):
+
+    key = models.CharField(max_length=255, unique=True)
+    sub_dur = models.CharField(max_length=50, choices=Sub.get_choices())
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
+
+    objects = SubscriptionKeyManager()  # Стандартный менеджер
+
+    def is_valid(self):
+        """Check if the key is still valid based on its expiration date and activation status."""
+        now = timezone.now()
+        return self.is_active and (self.expires_at is None or self.expires_at > now)
+
+    def __str__(self):
+        return self.key
+    
+    @staticmethod
+    def generate_key(prefix="drainwalk_", length=16):
+        suffix = ''.join(random.choices(string.ascii_uppercase + string.digits, k=length))
+        return f"{prefix}{suffix}"
+
 
