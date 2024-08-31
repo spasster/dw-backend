@@ -15,20 +15,21 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Check secrets
+    - name: Set up Docker tag
       run: |
-        echo "DOCKER_USER=${{ secrets.DOCKER_USER }}"
-        echo "REPOSITORY_NAME=${{ secrets.REPOSITORY_NAME }}"
+        echo "IMAGE_TAG=${{ secrets.DOCKER_USER }}/${{ secrets.REPOSITORY_NAME }}:$(date +%s)" >> $GITHUB_ENV
+        echo "LATEST_TAG=${{ secrets.DOCKER_USER }}/${{ secrets.REPOSITORY_NAME }}:latest" >> $GITHUB_ENV
     
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USER }}/$(echo ${{ secrets.REPOSITORY_NAME }}):test_tag
+      run: docker build . --file Dockerfile --tag ${{ env.IMAGE_TAG }}
     
-    - name: Tag the image to latest
-      run: docker tag ${{ secrets.DOCKER_USER }}/$(echo ${{ secrets.REPOSITORY_NAME }}):test_tag ${{ secrets.DOCKER_USER }}/$(echo ${{ secrets.REPOSITORY_NAME }}):latest
-    
+    - name: Tag the image as latest
+      run: docker tag ${{ env.IMAGE_TAG }} ${{ env.LATEST_TAG }}
+      
     - name: Docker Login
       run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
-    
+      
     - name: Push the image to Docker Hub
       run: |
-        docker push ${{ secrets.DOCKER_USER }}/$(echo ${{ secrets.REPOSITORY_NAME }}):latest
+        docker push ${{ env.IMAGE_TAG }}
+        docker push ${{ env.LATEST_TAG }}
