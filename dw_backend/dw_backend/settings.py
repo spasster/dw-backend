@@ -1,5 +1,7 @@
 from datetime import timedelta
 from pathlib import Path
+import os
+import environ
 
 from django.conf import settings
 
@@ -90,11 +92,11 @@ WSGI_APPLICATION = 'dw_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'drainwalk',
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'sk3d_pages',                      # Or path to database file if using sqlite3.
         'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '127.0.0.1',
+        'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', 'sex123'),    # Not used with sqlite3.
+        'HOST': os.environ.get('DJANGO_DB_HOST', ''),  # Используйте это значение для подключения к MySQL на том же хосте
         'PORT': '3306',
     }
 }
