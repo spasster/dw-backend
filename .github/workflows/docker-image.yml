@@ -2,9 +2,9 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "main" ]
 
 jobs:
 
@@ -20,7 +20,7 @@ jobs:
         echo "$GITHUB_SHA" > TAG 
         
       
-    - name: Build the Docker image
+    - name: Build the Docker image ПИЗДА
       run: docker build . --file Dockerfile --tag $(cat APP_NAME):$(cat TAG)
     
     - name: Tag the image to latest
