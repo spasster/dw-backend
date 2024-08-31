@@ -30,8 +30,8 @@ class NewKeys(APIView):
     authentication_classes = [JWTAuthentication]
 
     def post(self, request):
-        # key_number = request.data.get('number')
-        # user = request.user
+        key_number = request.data.get('number')
+        user = request.user
 
         try:
             # SubscriptionKey.objects.activate_sub_key(key=key, user=user)
