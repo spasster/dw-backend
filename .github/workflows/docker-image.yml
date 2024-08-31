@@ -15,19 +15,16 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set Tag in evn variable
-      run: |
-        echo "${{ secrets.DOCKER_USER }}/${{ secrets.REPOSITORY_NAME }}" > APP_NAME
-        echo "$GITHUB_SHA" > TAG 
-      
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag $(cat APP_NAME):$(cat TAG)
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USER }}/{{ secrets.REPOSITORY_NAME }}:$(date +%s)
     
     - name: Tag the image to latest
-      run: docker tag $(cat APP_NAME):$(cat TAG) $(cat APP_NAME):latest
+      run: docker tag ${{ secrets.DOCKER_USER }}/{{ secrets.REPOSITORY_NAME }}:$(date +%s) ${{ secrets.DOCKER_USER }}/{{ secrets.REPOSITORY_NAME }}:latest
       
     - name: Docker Login
-      run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
+      run: echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_USER }} --password-stdin
       
-    - name: Image push
-      run: docker push $(cat APP_NAME):latest
+    - name: Push the image to Docker Hub
+      run: |
+        docker push ${{ secrets.DOCKER_USER }}/{{ secrets.REPOSITORY_NAME }}:$(date +%s)
+        docker push ${{ secrets.DOCKER_USER }}/{{ secrets.REPOSITORY_NAME }}:latest
