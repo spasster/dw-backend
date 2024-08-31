@@ -1,26 +1,30 @@
 FROM python:3.12.2-slim
 
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-RUN apk update \
-    && apk add --no-cache \
-        build-base \
-        mariadb-connector-c-dev \
-        mariadb-dev \
+# Обновление и установка необходимых пакетов
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        libmariadb-dev-compat \
+        libmariadb-dev \
         libffi-dev \
-        openssl-dev \
-        pkgconfig \
-        bash
+        libssl-dev \
+        pkg-config \
+        bash \
+    && rm -rf /var/lib/apt/lists/*
 
-# Обновление pip python
+# Обновление pip
 RUN pip install --upgrade pip
+
 WORKDIR /app
 
-# Установка пакетов для проекта
+# Копирование requirements.txt и установка зависимостей
 COPY requirements.txt /app/
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
+# Копирование кода приложения
 ADD . /app/
 
 EXPOSE 8000
