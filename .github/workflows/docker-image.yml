@@ -17,8 +17,8 @@ jobs:
     - name: Установка переменных окружения для тэга
       run: |
         # Формируем имя для APP_NAME, убираем все лишние символы кроме допустимых
-        APP_NAME="${{ secrets.DOCKER_USER }}/$(echo ${{ secrets.REPOSITORY_NAME }} | tr -cd '[:alnum:]_-.')"
-        echo $APP_NAME > APP_NAME
+        APP_NAME="${{ secrets.DOCKER_USER }}/$(echo ${{ secrets.REPOSITORY_NAME }} | sed 's/[^a-zA-Z0-9_.-]//g')"
+        echo "$APP_NAME" > APP_NAME
         echo "$GITHUB_SHA" > TAG 
         
     - name: Вывод значений APP_NAME и TAG для отладки
