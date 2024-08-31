@@ -14,26 +14,20 @@ jobs:
     steps:
     - uses: actions/checkout@v1
       
-    - name: Установка переменных окружения для тэга
+    - name: Set Tag in evn variable
       run: |
-        # Формируем имя для APP_NAME, убираем все лишние символы кроме допустимых
-        APP_NAME="${{ secrets.DOCKER_USER }}/$(echo ${{ secrets.REPOSITORY_NAME }}
-        echo "$APP_NAME" > APP_NAME
+        echo "${{ secrets.DOCKER_USER }}/${{ secrets.REPOSITORY_NAME }}" > APP_NAME
         echo "$GITHUB_SHA" > TAG 
         
-    - name: Вывод значений APP_NAME и TAG для отладки
-      run: |
-        echo "APP_NAME=$(cat APP_NAME)"
-        echo "TAG=$(cat TAG)"
       
-    - name: Сборка Docker образа
+    - name: Build the Docker image
       run: docker build . --file Dockerfile --tag $(cat APP_NAME):$(cat TAG)
     
-    - name: Тэгирование образа как latest
+    - name: Tag the image to latest
       run: docker tag $(cat APP_NAME):$(cat TAG) $(cat APP_NAME):latest
       
-    - name: Логин в Docker
+    - name: Docker Login
       run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
       
-    - name: Пуш Docker образа
+    - name: Image push
       run: docker push $(cat APP_NAME):latest
