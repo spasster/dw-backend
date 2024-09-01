@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-6#r5tc_y-)(y6wha^8aj7vj(ia=@(+jsmyge!r07h6oj&*e^f#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["backend"]
+ALLOWED_HOSTS = ["https://drainwalk.tech/"]
 
 
 # Application definition
