@@ -92,9 +92,9 @@ WSGI_APPLICATION = 'dw_backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'sk3d_pages',                      # Or path to database file if using sqlite3.
+        'NAME': 'drainwalk',                      # Or path to database file if using sqlite3.
         'USER': 'root',
-        'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', 'sex123'),    # Not used with sqlite3.
+        'PASSWORD': os.environ.get('DJANGO_DB_PASSWORD', ''),    # Not used with sqlite3.
         'HOST': os.environ.get('DJANGO_DB_HOST', ''),  # Используйте это значение для подключения к MySQL на том же хосте
         'PORT': '3306',
     }
