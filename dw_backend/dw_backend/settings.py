@@ -15,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-6#r5tc_y-)(y6wha^8aj7vj(ia=@(+jsmyge!r07h6oj&*e^f#'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 ALLOWED_HOSTS = ['backend', 'localhost', '127.0.0.1', 'drainwalk.tech', 'frontend']
 
 CSRF_COOKIE_SECURE = True
