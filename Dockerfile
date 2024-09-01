@@ -1,28 +1,24 @@
-FROM python:3.12-alpine
+FROM python:3.12.2-slim
 
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-RUN apk update \
-    && apk add --no-cache \
-        build-base \
-        mariadb-connector-c-dev \
-        mariadb-dev \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        build-essential \
+        libmariadb-dev-compat \
+        libmariadb-dev \
         libffi-dev \
-        openssl-dev \
-        pkgconfig \
-        bash
+        libssl-dev \
+        pkg-config \
+        bash \
+    && rm -rf /var/lib/apt/lists/*
 
-# Обновление pip python
-RUN pip install --upgrade pip
 WORKDIR /app
 
-# Установка пакетов для проекта
 COPY requirements.txt /app/
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-ADD . /app/
+COPY . /app/
 
 EXPOSE 8000
-
-# CMD ["python", "sk3d_pages/manage.py", "runserver", "0.0.0.0:8000"]
