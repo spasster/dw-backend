@@ -35,26 +35,22 @@ class CustomAuthTokenSerializer(serializers.Serializer):
     password = serializers.CharField(style={'input_type': 'password'}, trim_whitespace=True)
 
     def validate(self, attrs):
-        logger.info(f"Login: {attrs.get('login')}, Password: {attrs.get('password')}")
 
-        logger.info("НАЧАЛО сериализатора")
         login = attrs.get('login')
         password = attrs.get('password')
 
         if login and password:
             user = authenticate(request=self.context.get('request'), username=login, password=password)
             if not user:
-                logger.info("юзернейм не подошел")
                 try:
                     user_obj = DwUser.objects.get(email=login)
                     user = authenticate(request=self.context.get('request'), username=user_obj.username, password=password)
                 except DwUser.DoesNotExist:
-                    logger.info("нету такого")
-                    raise AuthenticationFailed(_('Invalid username/email or password.1'))
+                    raise AuthenticationFailed(_('Invalid username/email or password.'))
 
             if not user:
                 logger.info("нихуя не подошло")
-                raise AuthenticationFailed(_('Invalid username/email or password.2'))
+                raise AuthenticationFailed(_('Invalid username/email or password.'))
             attrs['user'] = user
         else:
             raise serializers.ValidationError(_('Must include "username/email" and "password".'))

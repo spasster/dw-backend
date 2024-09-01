@@ -23,6 +23,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://drainwalk.tech/',
     'http://localhost/',
     'http://127.0.0.1/',
+    'http://backend/',
 ]
 # Application definition
 
