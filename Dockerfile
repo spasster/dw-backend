@@ -1,20 +1,18 @@
-FROM python:3.12.2-slim
+FROM python:3.12-alpine
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Обновление и установка необходимых пакетов, включая netcat-openbsd
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        build-essential \
-        libmariadb-dev-compat \
-        libmariadb-dev \
+# Обновление и установка необходимых пакетов
+RUN apk update \
+    && apk add --no-cache \
+        build-base \
+        mariadb-connector-c-dev \
+        mariadb-dev \
         libffi-dev \
-        libssl-dev \
-        pkg-config \
+        openssl-dev \
         bash \
-        netcat-openbsd \
-    && rm -rf /var/lib/apt/lists/*
+        netcat-openbsd
 
 # Обновление pip
 RUN pip install --upgrade pip
