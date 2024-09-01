@@ -24,5 +24,3 @@ RUN pip install -r requirements.txt
 ADD . /app/
 
 EXPOSE 8000
-
-# CMD ["python", "sk3d_pages/manage.py", "runserver", "0.0.0.0:8000"]
