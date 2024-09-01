@@ -1,9 +1,8 @@
 FROM python:3.12-alpine
 
-ENV PYTHONUNBUFFERED=1
+ENV PYTHONUNBUFFERED 1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Обновление и установка необходимых пакетов
 RUN apk update \
     && apk add --no-cache \
         build-base \
@@ -11,19 +10,17 @@ RUN apk update \
         mariadb-dev \
         libffi-dev \
         openssl-dev \
-        bash \
-        netcat-openbsd
+        pkgconfig \
+        bash
 
-# Обновление pip
+# Обновление pip python
 RUN pip install --upgrade pip
-
 WORKDIR /app
 
-# Копирование requirements.txt и установка зависимостей
+# Установка пакетов для проекта
 COPY requirements.txt /app/
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
-# Копирование кода приложения
 ADD . /app/
 
 EXPOSE 8000
