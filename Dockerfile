@@ -3,7 +3,7 @@ FROM python:3.12.2-slim
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Обновление и установка необходимых пакетов
+# Обновление и установка необходимых пакетов, включая netcat
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
         build-essential \
@@ -13,6 +13,7 @@ RUN apt-get update \
         libssl-dev \
         pkg-config \
         bash \
+        netcat \
     && rm -rf /var/lib/apt/lists/*
 
 # Обновление pip
