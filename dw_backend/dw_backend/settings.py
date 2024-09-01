@@ -20,10 +20,10 @@ ALLOWED_HOSTS = ['backend', 'localhost', '127.0.0.1', 'drainwalk.tech', 'fronten
 
 CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = [
-    'https://drainwalk.tech/',
-    'http://localhost/',
-    'http://127.0.0.1/',
-    'http://backend/',
+    'https://drainwalk.tech',
+    'http://localhost',
+    'http://127.0.0.1',
+    'http://backend',
 ]
 # Application definition
 
