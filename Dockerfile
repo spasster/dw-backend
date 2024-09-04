@@ -23,6 +23,6 @@ RUN pip install -r requirements.txt
 
 ADD . /app/
 
-RUN python dw_backend/manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput
 
 EXPOSE 8000
