@@ -3,3 +3,4 @@
 /.vscode
 dw_backend/**/migrations/
 dw_backend/**/__pycache__/
+dw_backend/staticfiles
