@@ -21,7 +21,7 @@ WORKDIR /app
 COPY requirements.txt /app/
 RUN pip install -r requirements.txt
 
-RUN python dw_backend/manage.py collectstatic --noinput
+# RUN python dw_backend/manage.py collectstatic --noinput
 
 ADD . /app/
 
