@@ -21,8 +21,8 @@ WORKDIR /app
 COPY requirements.txt /app/
 RUN pip install -r requirements.txt
 
-RUN python dw_backend/dw_backend/manage.py collectstatic --noinput
-
 ADD . /app/
+
+RUN python dw_backend/manage.py collectstatic --noinput
 
 EXPOSE 8000
