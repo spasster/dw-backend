@@ -12,22 +12,30 @@ jobs:
 
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
       
-    - name: Set Tag in evn variable
+    - name: Set Tag in env variable
       run: |
         echo "${{ secrets.DOCKER_USER }}/${{ secrets.REPOSITORY_NAME }}" > APP_NAME
-        echo "$GITHUB_SHA" > TAG 
+        echo "$GITHUB_SHA" > TAG
         
-      
-    - name: Build the Docker image ПИЗДА
+    - name: Clear Docker cache
+      run: docker builder prune -f
+    
+    - name: Build the Docker image
       run: docker build . --file Dockerfile --tag $(cat APP_NAME):$(cat TAG)
     
     - name: Tag the image to latest
       run: docker tag $(cat APP_NAME):$(cat TAG) $(cat APP_NAME):latest
       
+    - name: Tag the image with commit hash
+      run: docker tag $(cat APP_NAME):$(cat TAG) $(cat APP_NAME):$GITHUB_SHA
+      
     - name: Docker Login
       run: docker login -u ${{ secrets.DOCKER_USER }} -p ${{ secrets.DOCKER_PASSWORD }}
       
-    - name: Image push
+    - name: Push the image with commit hash
+      run: docker push $(cat APP_NAME):$GITHUB_SHA
+      
+    - name: Push the latest tag
       run: docker push $(cat APP_NAME):latest
