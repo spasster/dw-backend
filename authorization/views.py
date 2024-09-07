@@ -11,6 +11,8 @@ from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 from rest_framework import generics
+from django.conf import settings
+import requests
 
 from authorization.models import DwUser
 from authorization.serializers import DwUserSerializer
@@ -21,13 +23,45 @@ logger = logging.getLogger('authorization')
 
 
 class RegistrationViewSet(viewsets.ModelViewSet):
-    """Онли регистрация"""
+    """Регистрация с проверкой Cloudflare Turnstile"""
 
     authentication_classes = []
     permission_classes = [AllowAny]
 
     queryset = DwUser.objects.all()
     serializer_class = DwUserSerializer
+
+    def create(self, request, *args, **kwargs):
+        # Получаем токен капчи с фронтенда
+        turnstile_token = request.data.get('token')
+        print(turnstile_token)
+        # Проверяем, передан ли токен
+        if not turnstile_token:
+            return Response({'error': 'CAPTCHA token is missing'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Проверяем капчу через API Cloudflare
+        captcha_valid = self.verify_turnstile(turnstile_token)
+        if not captcha_valid:
+            return Response({'error': 'CAPTCHA validation failed'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Если капча прошла проверку, продолжаем регистрацию
+        return self.create_user(request, *args, **kwargs)
+
+    def verify_turnstile(self, token):
+        """Проверка капчи через API Cloudflare"""
+        url = "https://challenges.cloudflare.com/turnstile/v0/siteverify"
+        secret_key = settings.CLOUDFLARE_TURNSTILE_SECRET_KEY 
+        data = {
+            'secret': secret_key,
+            'response': token
+        }
+
+        try:
+            response = requests.post(url, data=data)
+            result = response.json()
+            return result.get('success', False)
+        except requests.RequestException:
+            return False
 
     def create_user(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
